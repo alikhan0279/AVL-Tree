@@ -1,0 +1,179 @@
+# random number generate krny ky leye
+import random
+
+# tree plot krny ky leye 
+import matplotlib.pyplot as plt
+
+# class for the nodes of the binary tree 
+class TreeNode:
+    def __init__(self, data):
+        # data: The value stored in this node
+        self.data = data  # Storing the node data
+        self.left = None  # Initializing the left child as None
+        self.right = None  # Initializing the right child as None
+
+# Function to insert data into the binary tree
+def insert(node, data):
+    # node: The root node of the tree (or subtree) where data is to be inserted
+    # data: The value to be inserted into the tree
+    
+    if not node:  # If the current node is None, create a new TreeNode
+        return TreeNode(data)
+    
+    if data < node.data:  # If the data is less than the current node's data, insert into the left subtree
+        node.left = insert(node.left, data)
+    elif data > node.data:  # If the data is greater than the current node's data, insert into the right subtree
+        node.right = insert(node.right, data)
+    
+    return node  # Return the (possibly updated) node
+
+# Function to plot the binary tree
+def plot_tree(ax, node, x, y, dx):
+    # ax: The matplotlib axis object to plot on
+    # node: The current node being plotted
+    # x: The x-coordinate for the node's position
+    # y: The y-coordinate for the node's position
+    # dx: The horizontal distance between the current node and its children
+    
+    if node:  # If the current node is not None
+        ax.text(x, y, str(node.data), style='oblique', ha='center', va='center', fontsize=70)  # Plot the node's data
+        if node.left:  # If the left child exists
+            ax.plot([x, x - dx], [y - 1, y - 3], 'k-')  # Draw a line to the left child
+            plot_tree(ax, node.left, x - dx, y - 3, dx * 0.5)  # Recursively plot the left subtree with adjusted coordinates and spacing
+        if node.right:  # If the right child exists
+            ax.plot([x, x + dx], [y - 1, y - 3], 'k-')  # Draw a line to the right child
+            plot_tree(ax, node.right, x + dx, y - 3, dx * 0.5)  # Recursively plot the right subtree with adjusted coordinates and spacing
+
+# Function to generate a list of random numbers
+def generate_random_nodes(n):
+    # n: The number of random nodes to generate
+    
+    return [random.randint(1, 100) for _ in range(n)]  # Generate n random numbers between 1 and 100
+
+# Get user input for the number of nodes
+n = int(input("Enter the number of nodes: "))
+
+# Ask the user if they want to input the numbers manually
+choice = input("Do you want to input the numbers manually? (yes/no): ").lower()
+
+if choice == 'yes':  # If the user chooses to input numbers manually
+    nodes = []
+    for i in range(n):  # Loop to get n node values from the user
+        node_val = int(input("Enter value for node {}: ".format(i + 1)))
+        nodes.append(node_val)  # Add the node value to the list
+else:  # If the user chooses not to input numbers manually
+    nodes = generate_random_nodes(n)  # Generate n random node values
+    print("Randomly generated numbers:", nodes)  # Print the generated numbers
+
+# Insert the nodes into an unsorted binary tree
+root_unsorted = None  # Initialize the root of the tree
+for node_val in nodes:  # Loop through each node value
+    root_unsorted = insert(root_unsorted, node_val)  # Insert the node into the tree
+
+# Plot the unsorted binary tree
+fig_unsorted, ax_unsorted = plt.subplots(figsize=(150, 150))  # Create a figure for the plot with a large size for visibility
+ax_unsorted.set_aspect(50)  # Set the aspect ratio for the plot to 50:1
+plot_tree(ax_unsorted, root_unsorted, 500, 500, 500)  # Plot the tree starting from the root with initial coordinates (500, 500) and spacing 500
+plt.axis('off')  # Turn off the axis
+plt.title("Unsorted Binary Tree")  # Set the title of the plot
+plt.show()  # Display the plot
+
+# Defining a class for the nodes of the AVL tree
+class AVLTreeNode:
+    def __init__(self, data):
+        # data: The value stored in this node
+        self.data = data  # Storing the node's data
+        self.left = None  # Initializing the left child as None
+        self.right = None  # Initializing the right child as None
+        self.height = 1  # Initializing the height of the node
+
+# Function to get the height of a node
+def getHeight(node):
+    # node: The node whose height is being calculated
+    
+    if not node:  # If the node is None, its height is 0
+        return 0
+    return node.height  # Return the node's height
+
+# Function to get the balance factor of a node
+def getBalance(node):
+    # node: The node whose balance factor is being calculated
+    
+    if not node:  # If the node is None, its balance factor is 0
+        return 0
+    return getHeight(node.left) - getHeight(node.right)  # Return the difference in heights of left and right subtrees
+
+# Function to perform a right rotation
+def rightRotate(y):
+    # y: The node around which the right rotation is performed
+    
+    x = y.left  # x is the left child of y
+    T2 = x.right  # T2 is the right child of x
+    x.right = y  # Make y the right child of x
+    y.left = T2  # Make T2 the left child of y
+    y.height = 1 + max(getHeight(y.left), getHeight(y.right))  # Update the height of y
+    x.height = 1 + max(getHeight(x.left), getHeight(x.right))  # Update the height of x
+    return x  # Return the new root after rotation
+
+# Function to perform a left rotation
+def leftRotate(x):
+    # x: The node around which the left rotation is performed
+    
+    y = x.right  # y is the right child of x
+    T2 = y.left  # T2 is the left child of y
+    y.left = x  # Make x the left child of y
+    x.right = T2  # Make T2 the right child of x
+    x.height = 1 + max(getHeight(x.left), getHeight(x.right))  # Update the height of x
+    y.height = 1 + max(getHeight(y.left), getHeight(y.right))  # Update the height of y
+    return y  # Return the new root after rotation
+
+# Function to insert data into the AVL tree
+def insert_avl(node, data):
+    # node: The root node of the AVL tree (or subtree) where data is to be inserted
+    # data: The value to be inserted into the AVL tree
+    
+    if not node:  # If the current node is None, create a new AVLTreeNode
+        return AVLTreeNode(data)
+    
+    if data < node.data:  # If the data is less than the current node's data, insert into the left subtree
+        node.left = insert_avl(node.left, data)
+    elif data > node.data:  # If the data is greater than the current node's data, insert into the right subtree
+        node.right = insert_avl(node.right, data)
+    
+    node.height = 1 + max(getHeight(node.left), getHeight(node.right))  # Update the height of the node
+    balance = getBalance(node)  # Get the balance factor of the node
+    
+    # If the node becomes unbalanced, perform rotations
+    
+    # Left Left Case
+    if balance > 1 and data < node.left.data:
+        return rightRotate(node)
+    
+    # Right Right Case
+    if balance < -1 and data > node.right.data:
+        return leftRotate(node)
+    
+    # Left Right Case
+    if balance > 1 and data > node.left.data:
+        node.left = leftRotate(node.left)  # First perform a left rotation on the left child
+        return rightRotate(node)  # Then perform a right rotation on the node
+    
+    # Right Left Case
+    if balance < -1 and data < node.right.data:
+        node.right = rightRotate(node.right)  # First perform a right rotation on the right child
+        return leftRotate(node)  # Then perform a left rotation on the node
+    
+    return node  # Return the (possibly updated) node
+
+# Insert the nodes into the AVL tree
+root_avl = None  # Initialize the root of the AVL tree
+for node_val in nodes:  # Loop through each node value
+    root_avl = insert_avl(root_avl, node_val)  # Insert the node into the AVL tree
+
+# Plot the AVL tree
+fig_avl, ax_avl = plt.subplots(figsize=(150, 150))  # Create a figure for the plot with a large size for visibility
+ax_avl.set_aspect(50)  # Set the aspect ratio for the plot to 50:1
+plot_tree(ax_avl, root_avl, 500, 500, 500)  # Plot the tree starting from the root with initial coordinates (500, 500) and spacing 500
+plt.axis('off')  # Turn off the axis
+plt.title("AVL Tree")  # Set the title of the plot
+plt.show()  # Display the plot
